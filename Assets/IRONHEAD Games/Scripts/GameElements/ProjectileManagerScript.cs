@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// UNUSED
+/// There might be need of this later for syncing projectiles across the network
+/// </summary>
 public class ProjectileManagerScript : MonoBehaviour
 {
-    public GameObject LeftLaserEmitter;
-    public GameObject RightLaserEmitter;
-
-    public GameObject BaseEnergyWeaponAsset;
-
     public bool GameMode = false;
 
 

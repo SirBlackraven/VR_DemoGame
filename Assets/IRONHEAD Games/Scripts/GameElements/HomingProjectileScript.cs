@@ -2,33 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Script for homing projectiles (NOT USED YET)
+/// </summary>
 public class HomingProjectileScript : MonoBehaviour
 {
+    //movement speed vars
     float ProjectileVelocity = 300;
-
     float TurnRate = 20f;
 
-    Rigidbody homingMissile;
+    Rigidbody homingMissile;      
 
     GameObject ProjectileModel;
 
-    GameObject emitter;
 
     ParticleSystem smokeParticlesSys;
-
     AudioClip fireSoundEffect;
 
-    private GameObject target;
+    private GameObject target;                  //acquired target
 
-    private float maxLifeSpan = 10.0f;
-    private float currentLifeSpan = 0.0f;
+    private float maxLifeSpan = 10.0f;          //maximum flight time
+    private float currentLifeSpan = 0.0f;       //current flight time
 
      // Start is called before the first frame update
     void Start()
     {
-            
-        Rigidbody body = ProjectileModel.GetComponent<Rigidbody>();
-        homingMissile = body;
+        try
+        {
+            Rigidbody body = ProjectileModel.GetComponent<Rigidbody>();
+            homingMissile = body;
+        }
+        catch(System.Exception ex)
+        {
+            DebugManagerScript.Instance.AddMessage("Failed to get projectile component/body:" + ex.Message + ", STACK:" + ex.StackTrace);
+        }
         
         Fire();
     }

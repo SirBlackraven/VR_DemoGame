@@ -10,24 +10,30 @@ public enum ElevatorBehavior
     WAITING //has reached its apex and is waiting to desecend
 }
 
+
+/// <summary>
+/// This script is creating and controlling more complex elevators than a basic trigger type.
+/// It is also used to open/close hangar doors (and could be used in other places)
+/// </summary>
 public class ElevatorScript : MonoBehaviour
 {
     public bool ElevatorActivated = false;
     public float Speed = 2;
-    public float HoldTime = 5;
+
+    public float HoldTime = 5;          //time the elevators stays in a position before returning to its home position
+    private float currentHoldTime = 0;  //how long the elevator has been waiting (compared to HoldTime)
+
     public bool SingleUse = false; //makes the elevator a one-time use operation. Use with caution to avoid entrapping a player
-    private bool hasBeenTriggered;
+    private bool hasBeenTriggered;  //special flag for use with the SingleUse indicator    
 
-    private float currentHoldTime = 0;    
-
-    public Vector3 EndPosition;
-    public Vector3 StartPosition;
+    public Vector3 EndPosition;     //Where the e elevator is to go to
+    public Vector3 StartPosition;   //initial position
 
     public bool DoNotReset = false; //Causes the elevator to stop after its first movement. Use to hold a platform in place or similar
 
-    public ElevatorBehavior status = ElevatorBehavior.PARKED;
+    public ElevatorBehavior status = ElevatorBehavior.PARKED;  //start state
 
-    public AudioSource elevatorSFX;
+    public AudioSource elevatorSFX; //sound effect for the moving elevator
 
     // Start is called before the first frame update
     void Start()
@@ -35,10 +41,12 @@ public class ElevatorScript : MonoBehaviour
         //save initial position from gui editor
         this.StartPosition = this.transform.position;
         status = ElevatorBehavior.PARKED;
-        //DebugManagerScript.Instance.AddMessage("Elevator init. Current position:" + this.StartPosition.ToString());
-        //DebugManagerScript.Instance.AddMessage("set end position:" + this.EndPosition.ToString());
     }
 
+    /// <summary>
+    /// Gateway to set the elevator status from an external source
+    /// </summary>
+    /// <param name="newStatus"></param>
     public void SetBehavior(ElevatorBehavior newStatus)
     {
         this.status = newStatus;
@@ -46,7 +54,6 @@ public class ElevatorScript : MonoBehaviour
 
     public void ElevatorActivate()
     {
-        //DebugManagerScript.Instance.AddMessage("Elevator activated-BEFORE");
         if (this.ElevatorActivated == false)
         {
             DebugManagerScript.Instance.AddMessage("Elevator activated. Current position:" + this.StartPosition.ToString());
@@ -64,6 +71,9 @@ public class ElevatorScript : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Utility function to freeze an elevator immediately. 
+    /// </summary>
     public void ElevatorDeactivate()
     {
         if (this.ElevatorActivated == true)
@@ -73,16 +83,13 @@ public class ElevatorScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-       // DebugManagerScript.Instance.AddMessage("Elevator listening");
         if (!ElevatorActivated)
         {
-
+            //not in use. bail out.
             return;
         }
-
 
         if(hasBeenTriggered && SingleUse) //single use elevator
         {
@@ -97,35 +104,24 @@ public class ElevatorScript : MonoBehaviour
         {
             case ElevatorBehavior.ASCENDING:
 
-                // Move the object upward in world space 1 unit/second.
-                //transform.Translate(Vector3.up * Time.deltaTime, Space.World);
-
-                //DebugManagerScript.Instance.AddMessage("Elevator ascension:" + this.transform.position.ToString());
                 transform.position = Vector3.MoveTowards(transform.position, this.EndPosition, Time.deltaTime * Speed);
                 if (this.transform.position.y >= this.EndPosition.y)
                 {
                     this.status = ElevatorBehavior.WAITING;
-                   //DebugManagerScript.Instance.AddMessage("Elevator now waiting");
                 }
 
                 break;
             case ElevatorBehavior.DESCENDING:
 
-                // Move the object downward in world space 1 unit/second.
-                //transform.Translate(Vector3.down * Time.deltaTime, Space.World);
-
-              // DebugManagerScript.Instance.AddMessage("Elevator descent:" + this.transform.position.ToString());
                 transform.position = Vector3.MoveTowards(transform.position, this.StartPosition, Time.deltaTime * Speed);
                 if (this.transform.position.y <= StartPosition.y)
                 {
                     status = ElevatorBehavior.PARKED;
                     
+                    //reset elevator
                     currentHoldTime = 0;
-                    this.transform.position = this.StartPosition;                    
-
+                    this.transform.position = this.StartPosition;    
                     this.ElevatorActivated = false;
-
-                   //DebugManagerScript.Instance.AddMessage("Elevator stopped:" + this.StartPosition.ToString());
                 }
 
                 break;
@@ -144,8 +140,8 @@ public class ElevatorScript : MonoBehaviour
                  }
 
                 break;
-            default:
-                DebugManagerScript.Instance.AddMessage("Unknown elevator state detected:" + status.ToString());
+            default:  //this should be impossible
+                DebugManagerScript.Instance.AddMessage("Error: Unknown elevator state detected:" + status.ToString());
 
                 break;
         }       

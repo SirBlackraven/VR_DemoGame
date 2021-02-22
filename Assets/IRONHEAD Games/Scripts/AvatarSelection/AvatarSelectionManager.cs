@@ -5,26 +5,24 @@ using UnityEngine;
 
 public class AvatarSelectionManager : MonoBehaviour
 {
-    //[SerializeField]
-    //GameObject AvatarSelectionPlatformGameobject;
-
-
+    //collections of avatars
     public GameObject[] selectableAvatarModels;
     public GameObject[] loadableAvatarModels;
 
     public int avatarSelectionNumber = 0;
 
-    public AvatarInputConverter avatarInputConverter;
+    public AvatarInputConverter avatarInputConverter;           //utility class used to attach inputs to selected avatar
 
-    public GameObject XRRigPlatform;
-    public GameObject MainViewpoint;
+    public GameObject XRRig;                                    //ref to XR rig
+    public GameObject MainViewpoint;                            //Player camera
 
+    //collection of world points to spawn in all players
     private Vector3 PlayerOneSpawnPoint = new Vector3(26.78f, 1.4f, -49.5f);
     private Vector3 PlayerTwoSpawnPoint = new Vector3(142.8f, 1.4f, 949.6f);
     private Vector3 PlayerThreeSpawnPoint = new Vector3(-413.3f, 1.4f, 460f);
     private Vector3 PlayerFourSpawnPoint = new Vector3(571.2f, 1.4f, 425f);
 
-    public GameObject playerController;
+    public GameObject playerController;                         //ref to main class that contains other player classes
 
     /// <summary>
     /// Singleton Implementation
@@ -44,25 +42,16 @@ public class AvatarSelectionManager : MonoBehaviour
 
     private void Start()
     {
-        //Initially, de-activating the Avatar Selection Platform.
-        //AvatarSelectionPlatformGameobject.SetActive(false);
-
+        //load initial avatar
         avatarSelectionNumber = 0;
         ActivateAvatarModelAt(avatarSelectionNumber);
         LoadAvatarModelAt(avatarSelectionNumber);
     }
 
-    public void ActivateAvatarSelectionPlatform()
-    {
-        //AvatarSelectionPlatformGameobject.SetActive(true);
-    }
-
-    public void DeactivateAvatarSelectionPlatform()
-    {
-        //AvatarSelectionPlatformGameobject.SetActive(false);
-
-    }
-
+    /// <summary>
+    /// Cycle avatar functions. this could be used in the future to add
+    /// more mech models to cycle through
+    /// </summary>
     public void NextAvatar()
     {
         avatarSelectionNumber += 1;
@@ -87,7 +76,7 @@ public class AvatarSelectionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates the selected Avatar model inside the Avatar Selection Platform
+    /// Activates the selected Avatar
     /// </summary>
     /// <param name="avatarIndex"></param>
     private void ActivateAvatarModelAt(int avatarIndex)
@@ -103,6 +92,9 @@ public class AvatarSelectionManager : MonoBehaviour
         LoadAvatarModelAt(avatarSelectionNumber);
     }
 
+    /// <summary>
+    /// Enter the Battlemech
+    /// </summary>
     public void EnterMech()
     {
         DebugManagerScript.Instance.AddMessage("Trying to board mech.");
@@ -110,13 +102,19 @@ public class AvatarSelectionManager : MonoBehaviour
         LoadAvatarModelAt(1);
     }
 
+    /// <summary>
+    /// Leave Battlemech and return to base avatar. Happens when the players is killed
+    /// </summary>
     public void LeaveMech()
     {
         DebugManagerScript.Instance.AddMessage("Trying to exit mech.");
         LoadAvatarModelAt(0);
     }
-
-    //TODO Expand this
+    /// <summary>
+    /// Resets the given player.
+    /// </summary>
+    /// <param name="playerNumber"></param>
+    //TODO: Expand this for players 2-4
     public void ResetPlayer(int playerNumber)
     {
         LeaveMech();
@@ -132,14 +130,13 @@ public class AvatarSelectionManager : MonoBehaviour
             default:
                 playerController.transform.position = PlayerOneSpawnPoint;
                 break;
-        }
-        
+        }        
     }
 
     /// <summary>
     /// Loads the Avatar Model and integrates into the VR Player Controller gameobject
     /// </summary>
-    /// <param name="avatarIndex"></param>
+    
     private void LoadAvatarModelAt(int avatarIndex)
     {
         foreach (GameObject loadableAvatarModel in loadableAvatarModels)
@@ -151,15 +148,13 @@ public class AvatarSelectionManager : MonoBehaviour
 
         avatarInputConverter.MainAvatarTransform = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().MainAvatarTransform;
 
+        //bind avatar body parts
         avatarInputConverter.AvatarBody = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().BodyTransform;
         avatarInputConverter.AvatarHead = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().HeadTransform;
         avatarInputConverter.AvatarHand_Left = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().HandLeftTransform;
         avatarInputConverter.AvatarHand_Right = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().HandRightTransform;
 
-        //avatarInputConverter.XRHead = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset;
         DebugManagerScript.Instance.AddMessage("setting rig platform offset to:" + loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset.position.ToString());
-       // XRRigPlatform.transform.position = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset.position;
-       //MainViewpoint. = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset;
 
         MainViewpoint.transform.SetPositionAndRotation(loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset.position,
             loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().AvatarCameraOffset.rotation);

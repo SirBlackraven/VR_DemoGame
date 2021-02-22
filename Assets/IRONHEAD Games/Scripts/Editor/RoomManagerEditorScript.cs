@@ -19,7 +19,7 @@ public class RoomManagerEditorScript : Editor
             roomManager.JoinRandomRoom();
         }
 
-        if(GUILayout.Button("Join Outdoor Room"))
+       /* if(GUILayout.Button("Join Outdoor Room"))
         {
             roomManager.OnEnterRoomButtonClicked_Outdoor();
         }
@@ -27,7 +27,7 @@ public class RoomManagerEditorScript : Editor
         if (GUILayout.Button("Join School Room"))
         {
             roomManager.OnEnterRoomButtonClicked_School();
-        }
+        }*/
     }
 
     

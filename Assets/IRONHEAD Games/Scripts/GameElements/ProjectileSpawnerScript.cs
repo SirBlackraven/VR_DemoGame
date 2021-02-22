@@ -3,31 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Spawner for a player's projectile. Effectively a "Gun"
+/// </summary>
 public class ProjectileSpawnerScript : MonoBehaviour
 {
-
-    public ProjectileScript Projectile;
-    public AudioSource SoundEffectSource;
-    public MultiplayerVRSynchronizationScript syncronizer;
+    public ProjectileScript Projectile;                     //ref to the projectile
+    public AudioSource SoundEffectSource;                   //sound effect gun makes
+    public MultiplayerVRSynchronizationScript syncronizer;  //Syncronization code for mu games 
     
-    public float FireRateDelay = 0.10f;
+    public float FireRateDelay = 0.10f;                     //cooldown on gone fire. Not used...yet
 
     public void FireProjectile()
     {
-        //DebugManagerScript.Instance.AddMessage("fire projectile called. Game active=" + GameStateManagerScript.Instance.GameActive.ToString());
         if (GameStateManagerScript.Instance.GameActive == false)
         { return; }
-
-        //DebugManagerScript.Instance.AddMessage("fire projectile called on left controller, trying to Instantiate:");
-        /* if (!GameStateManagerScript.Instance.GameActive)
-         {
-             return;
-         }*/
 
         if(SoundEffectSource != null)
         {
             SoundEffectSource.PlayOneShot(SoundEffectSource.clip);
-           // DebugManagerScript.Instance.AddMessage("Fire laser sound");
             
         }
 
@@ -36,19 +30,18 @@ public class ProjectileSpawnerScript : MonoBehaviour
             Instantiate(Projectile, transform);
             Rigidbody rb = Projectile.GetComponent<Rigidbody>();
             rb.velocity = transform.forward * Projectile.ProjectileVelocity;
-            
-
-           // DebugManagerScript.Instance.AddMessage("Object spawned at " + transform.position.ToString() + " velocity:" + rb.velocity.ToString());
         }
         catch (System.Exception ex)
         {
             DebugManagerScript.Instance.AddMessage("Projectile spawn error:" + ex.Message + "|Inner message:" + ex.InnerException);
         
-        }
-
-        
+        }        
     }
 
+    /// <summary>
+    /// RPC to sync fire in a MU game. 
+    /// </summary>
+    /// <param name="shooterId"></param>
     [PunRPC]
     public void RemoteFireProjectile(int shooterId)
     {
@@ -62,7 +55,7 @@ public class ProjectileSpawnerScript : MonoBehaviour
             return; //do nothing as it is myself
         }
         
-        //foreach()
+        //TODO - Finish
 
     }
 

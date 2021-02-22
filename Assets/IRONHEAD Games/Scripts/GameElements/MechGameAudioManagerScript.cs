@@ -2,22 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Centralized controller for game sound effects that the player hears. 
+/// Most of these are attached to the Mech's dashboard so they are within audible range
+/// Note: Sound sounds are connected to the emitting object so they will fade over distance
+/// </summary>
 public class MechGameAudioManagerScript : MonoBehaviour
 {
     public static MechGameAudioManagerScript Instance;
 
-    // Start is called before the first frame update
+    //catalog of sounds
     public AudioSource SeekerDeathEffect;
     public AudioSource MechWalkEffect;
     public AudioSource PlayerHitEffect;
     public AudioSource PlayerHealedEffect;
     public AudioSource HangarDoorEffect;
     public AudioSource PlayerMechDestroyed;
-   public AudioSource BGMusic;
+    public AudioSource BGMusic;                  //background music
 
-    public float mechWalkLoopDelay = 2.5f;
-    private float currentWalkLoop = 0.0f;
-    bool mechWalking = false;
+    //special vars to control the playback of the mech walk
+    public float mechWalkLoopDelay = 2.5f;      //how long to play the footstep SFX
+    private float currentWalkLoop = 0.0f;       //play time of the current 
+    bool mechWalking = false;                   //on-off flag for mech walk SFX
 
     private void Awake()
     {
@@ -30,16 +36,13 @@ public class MechGameAudioManagerScript : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
         if(mechWalking)
         {
+            //Keep playing the footstep soundeffect
+            //TODO: modulate this based on the throttle setting
             currentWalkLoop += Time.deltaTime;
             if (currentWalkLoop > mechWalkLoopDelay)
             {
@@ -49,9 +52,32 @@ public class MechGameAudioManagerScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Start the mech walking loop
+    /// </summary>
+    public void PlayMechWalking()
+    {
+        if (!mechWalking)
+        {
+            mechWalking = true;
+        }
+    }
+
+    /// <summary>
+    /// Calls for individual sounds
+    /// </summary>
     public void PlayHangarDoor()
     {
-        HangarDoorEffect.PlayOneShot(HangarDoorEffect.clip);
+        if (HangarDoorEffect != null)
+        {
+            HangarDoorEffect.PlayOneShot(HangarDoorEffect.clip);
+        }
+    }
+
+    public void StopMechWalking()
+    {
+        mechWalking = false;
+        MechWalkEffect.Stop();
     }
 
     public void PlaySeekerDeathSound()
@@ -62,33 +88,20 @@ public class MechGameAudioManagerScript : MonoBehaviour
         }
     }
 
-    public void PlayMechWalking()
-    {
-        if(!mechWalking)
-        {
-            mechWalking = true;
-            
-            //MechWalkEffect.PlayOneShot(MechWalkEffect.clip);
-        }
-        
-    }
-
-    public void StopMechWalking()
-    {
-        mechWalking = false;
-        MechWalkEffect.Stop();
-    }
-
     public void PlayMechDestroyed()
     {
-        DebugManagerScript.Instance.AddMessage("SFX played: player killed");
-        PlayerMechDestroyed.PlayOneShot(PlayerMechDestroyed.clip);
-
+        if(PlayerMechDestroyed != null)
+        {
+            PlayerMechDestroyed.PlayOneShot(PlayerMechDestroyed.clip);
+        } 
     }
 
     public void PlayerHit()
     {
-        this.PlayerHitEffect.PlayOneShot(PlayerHitEffect.clip);
+        if(PlayerHitEffect != null)
+        {
+            this.PlayerHitEffect.PlayOneShot(PlayerHitEffect.clip);
+        }        
     }
 
     public void PlayHealed()

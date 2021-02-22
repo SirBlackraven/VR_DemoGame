@@ -4,27 +4,22 @@ using UnityEngine;
 
 public class EnemyManagerScript : MonoBehaviour
 {
+    public List<GameObject> SpawnPoints = new List<GameObject>();           //list of potential spawn points
 
-   // private List<EnemyScript> enemyManifest = new List<EnemyScript>();
-
-    public GameStateManagerScript gameManager = null;
-
-    public List<GameObject> SpawnPoints = new List<GameObject>();
-
-    public GameObject enemyUnit;
-    public GameObject shooterUnit;
+    public GameObject enemyUnit;        //physical manifestation of the bug units
+    public GameObject shooterUnit;      //physical manifestation of the bug units
     public GameObject playerHealthBox;
 
-    public AudioSource SeekerDeathEffect;
-    //public GameObject target;
+    public AudioSource SeekerDeathEffect; //death SFX for the 'bug' enemies (TODO: should just be a generic "DeathEffect" for all enemies)
 
-    private float totalGameTime = 0.0f;
+    private float totalGameTime = 0.0f;     //time since the last enemy spawned
     private float spawnDelay = 5f;
 
+    //Test flags, not used in release
     private bool onlySpawnOne = false;
     private bool spawned = false;
 
-    public int EnemiesSpawned = 0;
+    public int EnemiesSpawned = 0;      //number of enemies used in game so far
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +42,6 @@ public class EnemyManagerScript : MonoBehaviour
         if(totalGameTime > localspawnDelay)
         {
             localspawnDelay -= 0.1f;
-
             if(localspawnDelay <= 0.1f)
             {
                 localspawnDelay = 0.1f;
@@ -59,61 +53,44 @@ public class EnemyManagerScript : MonoBehaviour
         }
     }
 
-    public void ChangeLevel()
-    {
-        gameManager.CurrentLevel++;
-    
-    
-    }
 
+    /// <summary>
+    /// CReates a new enemy in the arena
+    /// </summary>
     public void SpawnEnemy()
     {
-        if(onlySpawnOne && spawned)
+        //Test routine. Spawn 1 and only 1 enemy
+        /*if(onlySpawnOne && spawned)
         {
             return;
         }
 
-        spawned = true;
+        spawned = true;*/
 
+        //update total number of enemies used so far
+        EnemiesSpawned += 1;
+
+        //chose spawn location from list
         int maxIndex = this.SpawnPoints.Count - 1;
-
         int spawnSelected = Random.Range(0, maxIndex);
-        //int spawnSelected = 0;
-
         GameObject spawnLocation = this.SpawnPoints[spawnSelected];
 
-        if (EnemiesSpawned > 0)
+        //Chose what kind of enemy to spawn
+        //Every 5th enemy is a 'shooter'
+        if (EnemiesSpawned % 5 == 0)
         {
-
-            if (EnemiesSpawned % 5 == 0)
-            {
-                Instantiate(shooterUnit, spawnLocation.transform);
-            }
-            else
-            {
-                Instantiate(enemyUnit, spawnLocation.transform);
-            }
-
-            if (EnemiesSpawned % 10 == 0)
-            {
-                Instantiate(playerHealthBox, spawnLocation.transform);
-            }
+            Instantiate(shooterUnit, spawnLocation.transform);
         }
         else
         {
             Instantiate(enemyUnit, spawnLocation.transform);
         }
 
-
-        //DebugManagerScript.Instance.AddMessage("Enemy spawned at " + spawnLocation.transform.position.ToString());
-
-        EnemiesSpawned += 1;
-
-        
-    }
-
-    private void BuildEnemyManifest()
-    {
-
+        //every 10th enemy, spawn a heal powerup
+        if (EnemiesSpawned % 10 == 0)
+        {
+            Instantiate(playerHealthBox, spawnLocation.transform);
+        }
+  
     }
 }

@@ -8,11 +8,16 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class MechUIManager : MonoBehaviour
 {
+    /// <summary>
+    /// These lists hold all the UI elements that would show a playe's score
+    /// Example: The mech dash display and the in-game scoreboard (TODO)
+    /// </summary>
     public List<GameObject> PlayerOne_ScoreReadouts = new List<GameObject>();
     public List<GameObject> PlayerTwo_ScoreReadouts = new List<GameObject>();
     public List<GameObject> PlayerThree_ScoreReadouts = new List<GameObject>();
     public List<GameObject> PlayerFour_ScoreReadouts = new List<GameObject>();
 
+    //mech health bar
     public List<ProgressBar> playerHealthDisplay = new List<ProgressBar>();
 
     // Start is called before the first frame update
@@ -34,12 +39,12 @@ public class MechUIManager : MonoBehaviour
         playerHealthDisplay[playerNumber].BarValue = amount;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    /// <summary>
+    /// Adds to the specified player's score. This will update all UI's that display the score
+    /// Note: Player number is zero-based, of course; Player 1 = 0, ect ;)
+    /// </summary>
+    /// <param name="playerNumber"></param>
+    /// <param name="amount"></param>
     public void AddScore(int playerNumber, int amount)
     {
         //DebugManagerScript.Instance.AddMessage("Echo from Mech UI- score message: Player:" + playerNumber.ToString() + ", amount:" + amount.ToString());

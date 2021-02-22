@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
+
+/// <summary>
+/// This is used for changing the color of something interacted with in the VR world,
+/// such as a button when the hand is pressing on it.
+/// </summary>
 public class ColorChanger : MonoBehaviour
 {
     public Material selectMaterial = null;
@@ -24,7 +29,6 @@ public class ColorChanger : MonoBehaviour
 
     public void OnDestroy()
     {
-       // UnityEngine.Events.UnityAction<XRBaseInteractor>
        interactable.onHoverEntered.RemoveListener(SetSelectMaterial);
        interactable.onHoverExited.RemoveListener(SetOriginalMaterial);
     }

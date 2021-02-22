@@ -20,17 +20,18 @@ public class ProjectileScript : MonoBehaviour
 
     private Rigidbody rb;
 
-
-
-
     // Start is called before the first frame update
     void Start()
     {
-        //projectile = transform.rig
-        rb = GetComponent<Rigidbody>();
-        Fire();
-
-        //initialTransform = transform;
+        try
+        {
+            rb = GetComponent<Rigidbody>();
+            Fire();
+        }
+        catch(System.Exception ex)
+        {
+            DebugManagerScript.Instance.AddMessage("Failed to start projectile fire: " + ex.Message + " STACK:" + ex.StackTrace);
+        }
     }
 
     // Update is called once per frame
@@ -39,21 +40,20 @@ public class ProjectileScript : MonoBehaviour
 
     }
 
+    /// <summary>
+    ///     DEPRECIATED. Stub left incase needed later
+    /// </summary>
     public void Fire()
     {
         //DebugManagerScript.Instance.AddMessage("Audio clip on proectile triggered");
-        //AudioSource.PlayClipAtPoint(FireSoundEffect, soundEmitter.transform.position);
 
     }
 
+    
+    // continue on its flight path
     public void FixedUpdate()
     {
-
-        //DebugManagerScript.Instance.AddMessage("Fixed update; projectile position now " + this.transform.position.ToString() + " lifespan-" + currentLifeSpan.ToString());
-
-        
-
-        //set a max life so these dont pile up toward infinity
+        //increment life so these dont pile up toward infinity
         currentLifeSpan += Time.deltaTime;
 
         if (currentLifeSpan > maxLifeSpan)
@@ -62,15 +62,17 @@ public class ProjectileScript : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //transform.position = Vector3.MoveTowards(transform.position, this.EndPosition, Time.deltaTime * Speed);
-        
-        //rb.velocity = initialTransform.forward * ProjectileVelocity;
         rb.velocity = transform.forward * ProjectileVelocity;
 
+        //sever connection to parent after first pass so it doesnt track the parent
         transform.parent = null;
 
     }
 
+    /// <summary>
+    /// Check to see if we he the target
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnTriggerEnter(Collider collision)
     {
         DebugManagerScript.Instance.AddMessage("Projectile collision detected:" + collision.gameObject.tag);
@@ -86,9 +88,7 @@ public class ProjectileScript : MonoBehaviour
 
             script.Killed();
 
-            //Destroy(collision.gameObject);
             Destroy(gameObject);
-            //GameStateManagerScript.Instance.SeekerKilled();
         }
     }
 }
